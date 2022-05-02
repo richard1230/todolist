@@ -1,25 +1,27 @@
 import {useState, useEffect} from "react";
+import moment from 'moment';
 import {firebase} from "../firebase";
+import {collatedTasksExist} from "../helpers";
 
-const collatedTasksExist = () => {}
 
-export const useTasks = selectProject =>{
-  const [tasks,setTasks] = useState([]);
+export const useTasks = selectProject => {
+  const [tasks, setTasks] = useState([]);
 
-  useEffect(()=>{
-    let unsubscribe = firebase.firestore()
+  useEffect(() => {
+    let unsubscribe = firebase
+      .firestore()
       .collection('tasks')
-      .where('userId','==','0101010101');
+      .where('userId', '==', '0101010101');
 
     unsubscribe =
       selectProject && !collatedTasksExist(selectProject)
-     ? (unsubscribe = unsubscribe.where('projectId','==',selectProject))
-        :selectProject === 'TODAY'
-    ?(unsubscribe = unsubscribe.where('date','==',moment().format('DD/MM/YYYY')))
-        : selectProject === 'INBOX' || selectProject === 0
-    ?(unsubscribe = unsubscribe.where('date','==',''))
-          : unsubscribe
+        ? (unsubscribe = unsubscribe.where('projectId', '==', selectProject))
+        : selectProject === 'TODAY'
+          ? (unsubscribe = unsubscribe.where('date', '==', moment().format('DD/MM/YYYY')))
+          : selectProject === 'INBOX' || selectProject === 0
+            ? (unsubscribe = unsubscribe.where('date', '==', ''))
+            : unsubscribe
 
-  },[selectProject])
+  }, [selectProject])
 
 }
